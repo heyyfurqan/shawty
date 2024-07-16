@@ -2,22 +2,33 @@ package main
 
 import (
 	"fmt"
+	"furqan/shawty/internal/shortener"
+	"furqan/shawty/internal/storage"
 )
 
 func main() {
-	indexKey := 7465
+	store := storage.CreateNewStorage()
+	var url string
 
-	shortPath := Encode(indexKey)
+	fmt.Println("Enter a url to shorten: ")
+	fmt.Scan(&url)
+
+	indexKey := store.AddUrl(url)
+
+	shortPath := shortener.Encode(indexKey)
 	shawtyUrl := "https://shaw.ty/" + shortPath
 
-	fmt.Println("Converted Short Path is: ", shawtyUrl)
+	fmt.Println("Converted short url is: ", shawtyUrl)
 
-	decodedKey := Decode(shortPath)
-	fmt.Println("Decoded back is: ", decodedKey)
-
-	if decodedKey == indexKey {
-		fmt.Println("It works.")
+	var shawtyInput string
+	fmt.Println("Enter a url to decode: ")
+	fmt.Scan(&shawtyInput)
+	decodedKey := shortener.Decode(shawtyInput)
+	longUrl, ok := store.GetUrl(decodedKey)
+	if !ok {
+		fmt.Println("Requested url not found :(")
+		store.PrintStorage()
 	} else {
-		fmt.Println("Nuh uh.")
+		fmt.Println("Your decoded url is: ", longUrl)
 	}
 }
